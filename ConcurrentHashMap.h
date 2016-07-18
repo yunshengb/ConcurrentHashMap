@@ -15,7 +15,7 @@
 #include <stdexcept>
 
 // A thread-safe unordered map.
-template <typename K, typename V, typename C = V>
+template <typename K, typename V, typename C>
 class ConcurrentHashMap {
 public:
     ConcurrentHashMap();
