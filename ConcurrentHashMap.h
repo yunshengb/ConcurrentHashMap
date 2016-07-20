@@ -12,7 +12,6 @@
 #include <mutex>
 #include <unordered_map>
 #include <utility>
-#include <stdexcept>
 
 // A thread-safe unordered map.
 template <typename K, typename V, typename C>
@@ -45,8 +44,7 @@ V& ConcurrentHashMap<K, V, C>::getWithCreate(const K &key, const C &creator) {
     if (map_.find(key) != map_.end()) {
         return map_[key];
     }
-    V value = std::move(creator());
-    map_.insert(std::make_pair(key, std::move(value)));
+    map_.insert(std::make_pair(key, creator()));
     return map_[key];
 }
 
