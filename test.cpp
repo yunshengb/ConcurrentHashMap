@@ -25,7 +25,7 @@ public:
 int main() {
     ConcurrentHashMap<int, unique_ptr<Semaphore>, Creator> cm;
     unique_ptr<Semaphore> sema_ptr0 = move(cm.getWithCreate(7, Creator()));
-    unique_ptr<Semaphore> sema_ptr1 = move(cm.getAndRemove(7));
+    unique_ptr<Semaphore> sema_ptr1 = cm.getAndRemove(7);
     try {
         cm.get(7);
     } catch (const exception &e) {

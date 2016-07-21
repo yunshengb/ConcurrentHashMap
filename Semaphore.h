@@ -3,19 +3,17 @@
 
 class Semaphore {
 public:
-    Semaphore (int count_ = 0)
-        : count(count_) {}
+    Semaphore (int count_ = 0) : count(count_) {}
 
     inline void up() {
         std::unique_lock<std::mutex> lock(mtx);
-        count++;
+        ++count;
         cv.notify_one();
     }
 
     inline void down() {
         std::unique_lock<std::mutex> lock(mtx);
-
-        while(count == 0) {
+        while (count == 0) {
             cv.wait(lock);
         }
         count--;

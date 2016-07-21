@@ -19,6 +19,7 @@ class ConcurrentHashMap {
 public:
     ConcurrentHashMap();
     ~ConcurrentHashMap();
+    void put(const K &key, V &value);
     V& getWithCreate(const K &key, const C &creator);
     V& get(const K &key);
     const V& get(const K &key) const;
@@ -37,6 +38,12 @@ ConcurrentHashMap<K, V, C>::ConcurrentHashMap() {}
 
 template <typename K, typename V, typename C>
 ConcurrentHashMap<K, V, C>::~ConcurrentHashMap() {}
+
+template <typename K, typename V, typename C>
+void ConcurrentHashMap<K, V, C>::put(const K &key, V &value) {
+    std::lock_guard<std::mutex> guard(mutex_);
+    map_.insert(std::make_pair(key, std::move(value)));
+}
 
 template <typename K, typename V, typename C>
 V& ConcurrentHashMap<K, V, C>::getWithCreate(const K &key, const C &creator) {
