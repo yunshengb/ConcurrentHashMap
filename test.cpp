@@ -23,13 +23,17 @@ public:
 };
 
 int main() {
-    ConcurrentHashMap<int, unique_ptr<Semaphore>, Creator> cm;
-    unique_ptr<Semaphore> sema_ptr0 = move(cm.getWithCreate(7, Creator()));
-    unique_ptr<Semaphore> sema_ptr1 = cm.getAndRemove(7);
+    using Pointer = unique_ptr<const Semaphore>;
+    ConcurrentHashMap<int, Pointer, Creator> cm;
+    const Pointer sema_ptr0 = move(cm.getWithCreate(7, Creator()));
+    const Pointer sema_ptr1 = cm.remove(7);
     try {
         cm.get(7);
     } catch (const exception &e) {
         cout << e.what() << endl;
     }
+    Pointer sema_ptr2(new Semaphore);
+    cm.put(7, move(sema_ptr2));
+    Pointer sema_ptr3 = move(cm.get(7));
     return 0;
 }

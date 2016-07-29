@@ -19,11 +19,10 @@ class ConcurrentHashMap {
 public:
     ConcurrentHashMap();
     ~ConcurrentHashMap();
-    void put(const K &key, V &value);
-    V& getWithCreate(const K &key, const C &creator);
+    void put(const K &key, V value);
     V& get(const K &key);
-    const V& get(const K &key) const;
-    V getAndRemove(const K &key);
+    V& getWithCreate(const K &key, const C &creator);
+    V remove(const K &key);
     ConcurrentHashMap(const ConcurrentHashMap &cm) = delete;
     ConcurrentHashMap(const ConcurrentHashMap &&cm) = delete;
     ConcurrentHashMap &operator=(const ConcurrentHashMap &cm) = delete;
@@ -40,9 +39,15 @@ template <typename K, typename V, typename C>
 ConcurrentHashMap<K, V, C>::~ConcurrentHashMap() {}
 
 template <typename K, typename V, typename C>
-void ConcurrentHashMap<K, V, C>::put(const K &key, V &value) {
+void ConcurrentHashMap<K, V, C>::put(const K &key, V value) {
     std::lock_guard<std::mutex> guard(mutex_);
     map_.insert(std::make_pair(key, std::move(value)));
+}
+
+template <typename K, typename V, typename C>
+V& ConcurrentHashMap<K, V, C>::get(const K &key) {
+    std::lock_guard<std::mutex> guard(mutex_);
+    return map_.at(key);
 }
 
 template <typename K, typename V, typename C>
@@ -56,19 +61,7 @@ V& ConcurrentHashMap<K, V, C>::getWithCreate(const K &key, const C &creator) {
 }
 
 template <typename K, typename V, typename C>
-V& ConcurrentHashMap<K, V, C>::get(const K &key) {
-    std::lock_guard<std::mutex> guard(mutex_);
-    return map_.at(key);
-}
-
-template <typename K, typename V, typename C>
-const V& ConcurrentHashMap<K, V, C>::get(const K &key) const {
-    std::lock_guard<std::mutex> guard(mutex_);
-    return map_.at(key);
-}
-
-template <typename K, typename V, typename C>
-V ConcurrentHashMap<K, V, C>::getAndRemove(const K &key) {
+V ConcurrentHashMap<K, V, C>::remove(const K &key) {
     std::lock_guard<std::mutex> guard(mutex_);
     V save = std::move(map_.at(key));
     map_.erase(key);
